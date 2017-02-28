@@ -99,6 +99,8 @@ public class ObsidianResource {
    {
       commandMap.put("obsidian-new-quickstart", "Obsidian: New Quickstart");
       commandMap.put("obsidian-new-project", "Obsidian: New Project");
+      commandMap.put("forge-configure-git-account", "fabric8: Configure Git Account");
+      commandMap.put("forge-git-accounts-configured", "fabric8: Git Accounts Configured");
    }
 
    @Inject
