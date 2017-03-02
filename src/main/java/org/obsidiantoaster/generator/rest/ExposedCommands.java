@@ -32,8 +32,10 @@ public class ExposedCommands
 
    public ExposedCommands()
    {
-      addZipCommand("obsidian-new-quickstart", "Obsidian: New Quickstart");
-      addZipCommand("obsidian-new-project", "Obsidian: New Project");
+      addCommand("obsidian-new-quickstart", "Obsidian: New Quickstart");
+      addCommand("obsidian-new-project", "Obsidian: New Project");
+      addCommand("forge-configure-git-account", "fabric8: Configure Git Account");
+      addQuery("forge-check-git-accounts", "fabric8: Check Git Accounts");
    }
 
    /**
