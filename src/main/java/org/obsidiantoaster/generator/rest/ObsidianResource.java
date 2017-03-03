@@ -39,6 +39,7 @@ import javax.enterprise.concurrent.ManagedExecutorService;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
+import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.json.JsonString;
@@ -60,6 +61,7 @@ import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -295,14 +297,14 @@ public class ObsidianResource
    }
 
    @POST
-   @javax.ws.rs.Path("/commands/{commandName}/execute")
+   @javax.ws.rs.Path("/commands/{commandName}/zip")
    @Consumes(MediaType.APPLICATION_JSON)
    public Response downloadZip(JsonObject content,
             @PathParam("commandName") @DefaultValue(DEFAULT_COMMAND_NAME) String commandName,
             @Context HttpHeaders headers)
             throws Exception
    {
-      exposedCommands.validateCommand(commandName);
+      exposedCommands.validateZipCommand(commandName);
       try (CommandController controller = getCommand(commandName, headers))
       {
          helper.populateControllerAllInputs(content, controller);
@@ -311,12 +313,12 @@ public class ObsidianResource
             Result result = controller.execute();
             if (result instanceof Failed)
             {
-               return Response.status(Status.INTERNAL_SERVER_ERROR).entity(getMessage(result)).build();
+               JsonObjectBuilder builder = Json.createObjectBuilder();
+               helper.describeResult(builder,result);
+               return Response.status(Status.INTERNAL_SERVER_ERROR).entity(builder).build();
             }
             else
             {
-               if (exposedCommands.generateZipCommand(commandName))
-               {
                UISelection<?> selection = controller.getContext().getSelection();
                java.nio.file.Path path = Paths.get(selection.get().toString());
                // Find artifactId
@@ -331,16 +333,53 @@ public class ObsidianResource
                         .type("application/zip")
                         .header("Content-Disposition", "attachment; filename=\"" + artifactId + ".zip\"")
                         .build();
-               }
-               else {
-                  String entity = getMessage(result);
-                  String contentType = "plain/text";
-                  if (isJsonString(entity)) {
-                     contentType = "application/json";
-                  }
+            }
+         }
+         else
+         {
+            JsonObjectBuilder builder = createObjectBuilder();
+            helper.describeValidation(builder, controller);
+            return Response.status(Status.PRECONDITION_FAILED).entity(builder.build()).build();
+         }
+      }
+   }
+
+   @POST
+   @javax.ws.rs.Path("/commands/{commandName}/execute")
+   @Consumes(MediaType.APPLICATION_JSON)
+   public Response executeCommandJson(JsonObject content,
+            @PathParam("commandName") @DefaultValue(DEFAULT_COMMAND_NAME) String commandName,
+            @Context HttpHeaders headers)
+            throws Exception
+   {
+      exposedCommands.validateCommand(commandName);
+      try (CommandController controller = getCommand(commandName, headers))
+      {
+         helper.populateControllerAllInputs(content, controller);
+         if (controller.isValid())
+         {
+            Result result = controller.execute();
+            if (result instanceof Failed)
+            {
+               JsonObjectBuilder builder = Json.createObjectBuilder();
+               helper.describeResult(builder,result);
+               return Response.status(Status.INTERNAL_SERVER_ERROR).entity(builder).build();
+            }
+            else
+            {
+               Object entity = getEntity(result);
+               if (entity != null)
+               {
                   return Response
                            .ok(entity)
-                           .type(contentType)
+                           .type(MediaType.APPLICATION_JSON)
+                           .build();
+               }
+               else
+               {
+                  return Response
+                           .ok(getMessage(result))
+                           .type(MediaType.TEXT_PLAIN)
                            .build();
                }
             }
@@ -352,6 +391,25 @@ public class ObsidianResource
             return Response.status(Status.PRECONDITION_FAILED).entity(builder.build()).build();
          }
       }
+   }
+
+   /**
+    * Returns the entity from the result handling {@link CompositeResult} values as a List of entities
+    */
+   protected static Object getEntity(Result result)
+   {
+      if (result instanceof CompositeResult) {
+         CompositeResult compositeResult = (CompositeResult) result;
+         List<Object> answer = new ArrayList<>();
+         List<Result> results = compositeResult.getResults();
+         for (Result child : results)
+         {
+            Object entity = getEntity(child);
+            answer.add(entity);
+         }
+         return answer;
+      }
+      return result.getEntity().get();
    }
 
    /**
@@ -379,18 +437,6 @@ public class ObsidianResource
 
       }
       return result.getMessage();
-   }
-
-   private boolean isJsonString(String text)
-   {
-      if (text != null)
-      {
-         String trimmed = text.trim();
-         return (trimmed.startsWith("\"") && trimmed.endsWith("\"")) ||
-                  (trimmed.startsWith("{") && trimmed.endsWith("}")) ||
-                  (trimmed.startsWith("[") && trimmed.endsWith("]"));
-      }
-      return false;
    }
 
    private CommandController getCommand(String name, HttpHeaders headers) throws Exception
