@@ -80,11 +80,30 @@ public class ExposedCommands
             message = "No commands are supported by this service";
          } else
          {
-            message = "No such command `" + name + "`. Supported commmands are '" + String
+            message = "No such command `" + name + "`. Supported commands are '" + String
                      .join("', '", commandMap.keySet()) + "'";
          }
          throw new WebApplicationException(message, Response.Status.NOT_FOUND);
       }
+   }
+
+   /**
+    * Validates the command name can generate a zip
+    */
+   public void validateZipCommand(String name)
+   {
+      if (!zipCommands.contains(name)) {
+         String message;
+         if (zipCommands.isEmpty()) {
+            message = "No commands can generate zips in this service";
+         } else
+         {
+            message = "No such zip command `" + name + "`. Supported zip commands are '" + String
+                     .join("', '", zipCommands) + "'";
+         }
+         throw new WebApplicationException(message, Response.Status.NOT_FOUND);
+      }
+
    }
 
 
