@@ -35,6 +35,27 @@
       <skipStaging>false</skipStaging>
    </properties>
 
+   <inceptionYear>2017</inceptionYear>
+
+   <organization>
+     <name>Red Hat</name>
+     <url>http://redhat.com</url>
+   </organization>
+
+   <licenses>
+     <license>
+       <name>Apache License, Version 2.0</name>
+       <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+       <distribution>repo</distribution>
+     </license>
+   </licenses>
+ 
+   <prerequisites>
+     <maven>3.2.1</maven>
+   </prerequisites>
+
+
+
    <dependencyManagement>
       <dependencies>
          <dependency>
@@ -60,7 +81,7 @@
    </dependencyManagement>
 
    <build>
-      <finalName>generator</finalName>
+      <finalName>generator-swarm</finalName>
       <plugins>
          <plugin>
             <artifactId>maven-release-plugin</artifactId>
@@ -236,6 +257,13 @@
                         <includes>
                            <include>wildfly-swarm</include>
                         </includes>
+                        <!--
+                        TODO until the next version of fmp is released lets explicitly disable the
+                        webapp generator which breaks the wildfly-swarm war based fat jars
+                        -->
+                        <excludes>
+                          <exclude>webapp</exclude>
+                        </excludes>
                      </generator>
                   </configuration>
                   <executions>
