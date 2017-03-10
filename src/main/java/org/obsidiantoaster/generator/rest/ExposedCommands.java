@@ -34,8 +34,11 @@ public class ExposedCommands
    {
       addCommand("obsidian-new-quickstart", "Obsidian: New Quickstart");
       addCommand("obsidian-new-project", "Obsidian: New Project");
-      addCommand("forge-configure-git-account", "fabric8: Configure Git Account");
+      addCommand("forge-import-git", "fabric8: Import Git");
       addQuery("forge-check-git-accounts", "fabric8: Check Git Accounts");
+
+      // TODO only enable if not using SaaS mode:
+      addCommand("forge-configure-git-account", "fabric8: Configure Git Account");
    }
 
    /**
