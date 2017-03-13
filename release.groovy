@@ -29,7 +29,7 @@ def release(project){
     groupId = 'io.fabric8'
     githubOrganisation = 'fabric8io'
     artifactIdToWatchInCentral = 'generator-backend'
-    artifactExtensionToWatchInCentral = 'jar'
+    artifactExtensionToWatchInCentral = 'war'
   }
 }
 
