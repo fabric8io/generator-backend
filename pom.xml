@@ -6,7 +6,7 @@
       <version>22</version>
    </parent>
    <modelVersion>4.0.0</modelVersion>
-   <groupId>org.obsidiantoaster</groupId>
+   <groupId>io.fabric8</groupId>
    <artifactId>generator-backend</artifactId>
    <name>Obsidian Generator: Backend</name>
    <version>1.0.0-SNAPSHOT</version>
@@ -19,14 +19,15 @@
       <obsidian.forge.version>${project.version}</obsidian.forge.version>
       <fabric8.maven.plugin.version>3.2.28</fabric8.maven.plugin.version>
       <fabric8.generator.version>1.0.4</fabric8.generator.version>
+      <maven.enforcer.plugin.version>1.4</maven.enforcer.plugin.version>
       <wildfly.swarm.version>2017.3.2</wildfly.swarm.version>
       <forge.version>3.6.0.Alpha2</forge.version>
       <forge.service.version>1.0.0.Beta8</forge.service.version>
       <furnace.version>2.25.2.Final</furnace.version>
       <!-- SCM properties -->
-      <obs.scm.git.connection>scm:git:git://github.com/obsidian-toaster/generator-backend.git</obs.scm.git.connection>
-      <obs.scm.dev.connection>scm:git:git@github.com:obsidian-toaster/generator-backend.git</obs.scm.dev.connection>
-      <obs.scm.url>http://github.com/obsidian-toaster/generator-backend</obs.scm.url>
+      <obs.scm.git.connection>scm:git:git://github.com/fabric8io/generator-backend.git</obs.scm.git.connection>
+      <obs.scm.dev.connection>scm:git:git@github.com:fabric8io/generator-backend.git</obs.scm.dev.connection>
+      <obs.scm.url>http://github.com/fabric8io/generator-backend</obs.scm.url>
       <obs.scm.tag>HEAD</obs.scm.tag>
       <!-- Nexus Staging Repo -->
       <serverId>jboss-releases-repository</serverId>
@@ -93,14 +94,15 @@
                </excludes>
             </configuration>
          </plugin>
-         <plugin>
+         <!--not needed when using fabric8 + Jenkins Pipeines -->
+         <!--<plugin>
             <artifactId>maven-release-plugin</artifactId>
             <configuration>
                <releaseProfiles>gpg-sign,jboss-release,release</releaseProfiles>
                <tagNameFormat>@{project.version}</tagNameFormat>
             </configuration>
-         </plugin>
-         <plugin>
+         </plugin>-->
+         <!--<plugin>
             <groupId>org.sonatype.plugins</groupId>
             <artifactId>nexus-staging-maven-plugin</artifactId>
             <version>1.6.3</version>
@@ -111,7 +113,7 @@
                <nexusUrl>${nexusUrl}</nexusUrl>
                <skipStaging>${skipStaging}</skipStaging>
             </configuration>
-         </plugin>
+         </plugin>-->
          <plugin>
             <artifactId>maven-war-plugin</artifactId>
             <configuration>
@@ -287,6 +289,84 @@
                </plugin>
             </plugins>
          </build>
+      </profile>
+      <profile>
+        <id>release</id>
+        <build>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-gpg-plugin</artifactId>
+              <executions>
+                <execution>
+                  <id>sign-artifacts</id>
+                  <phase>verify</phase>
+                  <goals>
+                    <goal>sign</goal>
+                  </goals>
+                </execution>
+              </executions>
+            </plugin>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-enforcer-plugin</artifactId>
+              <version>${maven.enforcer.plugin.version}</version>
+              <executions>
+                <execution>
+                  <id>enforce-no-snapshots</id>
+                  <goals>
+                    <goal>enforce</goal>
+                  </goals>
+                  <configuration>
+                    <rules>
+                      <requireReleaseDeps>
+                        <message>No Snapshots Allowed!</message>
+                      </requireReleaseDeps>
+                    </rules>
+                    <fail>true</fail>
+                  </configuration>
+                </execution>
+              </executions>
+            </plugin>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-javadoc-plugin</artifactId>
+              <executions>
+                <execution>
+                  <id>attach-javadocs</id>
+                  <goals>
+                    <goal>jar</goal>
+                  </goals>
+                  <configuration>
+                    <additionalparam>${javadoc.opts}</additionalparam>
+                  </configuration>
+                </execution>
+              </executions>
+            </plugin>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-source-plugin</artifactId>
+              <version>2.4</version>
+              <executions>
+                <execution>
+                  <id>attach-sources</id>
+                  <goals>
+                    <goal>jar</goal>
+                  </goals>
+                </execution>
+              </executions>
+            </plugin>
+          </plugins>
+        </build>
+      </profile>
+      <profile>
+        <id>doclint-java8-disable</id>
+        <activation>
+          <jdk>[1.8,)</jdk>
+        </activation>
+        <properties>
+          <javadoc.opts>-Xdoclint:none</javadoc.opts>
+        </properties>
       </profile>
    </profiles>
    <scm>
