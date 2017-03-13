@@ -16,7 +16,7 @@
  */
 @Library('github.com/fabric8io/fabric8-pipeline-library@master')
 def dummy
-releaseNode
+releaseNode{
   ws{
     checkout scm
     readTrusted 'release.groovy'
