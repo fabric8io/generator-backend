@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+def imagesBuiltByPipline() {
+  return ['generator-backend']
+}
+
 def stage(){
   return stageProject{
     project = 'fabric8io/generator-backend'
@@ -30,6 +35,8 @@ def release(project){
     githubOrganisation = 'fabric8io'
     artifactIdToWatchInCentral = 'generator-backend'
     artifactExtensionToWatchInCentral = 'war'
+    dockerOrganisation = 'fabric8'
+    imagesToPromoteToDockerHub = imagesBuiltByPipline()
   }
 }
 
