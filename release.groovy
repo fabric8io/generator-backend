@@ -36,6 +36,7 @@ def release(project){
     artifactIdToWatchInCentral = 'generator-backend'
     artifactExtensionToWatchInCentral = 'war'
     dockerOrganisation = 'fabric8'
+    promoteToDockerRegistry = 'docker.io'
     imagesToPromoteToDockerHub = imagesBuiltByPipline()
   }
 }
