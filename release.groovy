@@ -26,7 +26,7 @@ def release(project){
     stagedProject = project
     useGitTagForNextVersion = true
     helmPush = false
-    groupId = 'org.obsidiantoaster'
+    groupId = 'io.fabric8'
     githubOrganisation = 'fabric8io'
     artifactIdToWatchInCentral = 'generator-backend'
     artifactExtensionToWatchInCentral = 'jar'
