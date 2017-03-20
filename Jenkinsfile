@@ -15,47 +15,51 @@
  * limitations under the License.
  */
 @Library('github.com/fabric8io/fabric8-pipeline-library@master')
-def dummy
-deployOpenShiftTemplate(openshiftConfigSecretName: 'dsaas-preview-fabric8-forge-config'){
-  releaseNode{
-    ws{
-      checkout scm
-      readTrusted 'release.groovy'
-      sh "git remote set-url origin git@github.com:fabric8io/generator-backend.git"
+def releaseVersion
 
-      def pipeline = load 'release.groovy'
+releaseNode{
+  ws{
+    checkout scm
+    readTrusted 'release.groovy'
+    sh "git remote set-url origin git@github.com:fabric8io/generator-backend.git"
 
-      stage 'Stage'
-      def stagedProject = pipeline.stage()
-      releaseVersion = stagedProject[1]
+    def pipeline = load 'release.groovy'
 
-      stage 'Promote'
-      pipeline.release(stagedProject)
+    stage 'Stage'
+    def stagedProject = pipeline.stage()
+    releaseVersion = stagedProject[1]
 
-      container(name: 'clients') {
-        stage "Deploying ${releaseVersion}"
-        def prj = 'dsaas-preview-fabric8-forge'
-        def name = 'generator-backend'
-        def forgeURL = 'forge.api.prod-preview.openshift.io'
-        sh """
+    stage 'Promote'
+    pipeline.release(stagedProject)
+  }
+}
 
-          echo "now deploying to namespace ${prj}"
-          oc process -n ${prj} -f http://central.maven.org/maven2/io/fabric8/${name}/${releaseVersion}/${name}-${releaseVersion}-openshift.yml -v FORGE_HOST=${forgeURL} | oc apply -n ${prj} -f -
+deployOpenShiftNode(openshiftConfigSecretName: 'dsaas-preview-fabric8-forge-config'){
+  ws{
+    stage "Deploying ${releaseVersion}"
+    container(name: 'clients') {
+      
+      def prj = 'dsaas-preview-fabric8-forge'
+      def name = 'generator-backend'
+      def forgeURL = 'forge.api.prod-preview.openshift.io'
+      def yaml = "http://central.maven.org/maven2/io/fabric8/${name}/${releaseVersion}/${name}-${releaseVersion}-openshift.yml"
 
-          sleep 10 // ok bad bad but there's a delay between DC's being applied and new pods being started.  lets find a better way to do this looking at the new DC perhaps?
+      echo "now deploying to namespace ${prj}"
+      sh """
+        oc process -n ${prj} -f ${yaml} -v FORGE_URL=${forgeURL} | oc apply -n ${prj} -f -
+      """
+      sleep 10 // ok bad bad but there's a delay between DC's being applied and new pods being started.  lets find a better way to do this looking at the new DC perhaps?
 
-          waitUntil{
-            // wait until the pods are running has been deleted
-            try{
-              sh "oc get pod -l project=${name},provider=fabric8 -n ${prj} | grep Running"
-              echo "${name} pod Running for v ${releaseVersion}"
-              return true
-            } catch (err) {
-              echo "waiting for ${name} to be ready..."
-              return false
-            }
-          }
-        """
+      waitUntil{
+        // wait until the pods are running
+        try{
+          sh "oc get pod -l project=${name},provider=fabric8 -n ${prj} | grep Running"
+          echo "${name} pod Running for v ${releaseVersion}"
+          return true
+        } catch (err) {
+          echo "waiting for ${name} to be ready..."
+          return false
+        }
       }
     }
   }

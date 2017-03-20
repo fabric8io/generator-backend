@@ -6,6 +6,7 @@ spec:
       - env:
         - name: KEYCLOAK_SAAS_URL
           value: http://sso.prod-preview.openshift.io
+        workingDir: /home
         readinessProbe:
           timeoutSeconds: 3
           initialDelaySeconds: 3
