@@ -1,0 +1,9 @@
+metadata:
+  name: "generator-backend"
+spec:
+  to:
+    kind: Service
+    name: "generator-backend"
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
