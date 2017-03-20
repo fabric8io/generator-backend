@@ -6,4 +6,17 @@ spec:
       - env:
         - name: KEYCLOAK_SAAS_URL
           value: http://sso.prod-preview.openshift.io
+        readinessProbe:
+          timeoutSeconds: 3
+          initialDelaySeconds: 3
+          httpGet:
+            path: "forge/version"
+            port: 8080
+        livenessProbe:
+          timeoutSeconds: 3
+          initialDelaySeconds: 120
+          failureThreshold: 10
+          httpGet:
+            path: "forge/version"
+            port: 8080
       serviceAccountName: "${project.artifactId}"

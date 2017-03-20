@@ -1,6 +1,7 @@
 metadata:
   name: "generator-backend"
 spec:
+  host: ${FORGE_URL}
   to:
     kind: Service
     name: "generator-backend"
