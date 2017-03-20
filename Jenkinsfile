@@ -33,9 +33,9 @@ deployOpenShiftTemplate(openshiftConfigSecretName: 'dsaas-preview-fabric8-forge-
       pipeline.release(stagedProject)
 
       container(name: 'clients') {
-        stage "Applying ${releaseVersion} updates"
+        stage "Deploying ${releaseVersion}"
         def prj = 'dsaas-preview-fabric8-forge'
-        def name 'generator-backend'
+        def name = 'generator-backend'
         def forgeURL = 'forge.api.prod-preview.openshift.io'
         sh """
 
