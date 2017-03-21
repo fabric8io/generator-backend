@@ -17,7 +17,7 @@
       <!-- Versions -->
       <arquillian.version>1.1.12.Final</arquillian.version>
       <obsidian.forge.version>${project.version}</obsidian.forge.version>
-      <fabric8.maven.plugin.version>3.2.28</fabric8.maven.plugin.version>
+      <fabric8.maven.plugin.version>3.3.0</fabric8.maven.plugin.version>
       <fabric8.generator.version>1.0.4</fabric8.generator.version>
       <maven.enforcer.plugin.version>1.4</maven.enforcer.plugin.version>
       <wildfly.swarm.version>2017.3.2</wildfly.swarm.version>
@@ -264,20 +264,6 @@
                   <groupId>io.fabric8</groupId>
                   <artifactId>fabric8-maven-plugin</artifactId>
                   <version>${fabric8.maven.plugin.version}</version>
-                  <configuration>
-                     <generator>
-                        <includes>
-                           <include>wildfly-swarm</include>
-                        </includes>
-                        <!--
-                        TODO until the next version of fmp is released lets explicitly disable the
-                        webapp generator which breaks the wildfly-swarm war based fat jars
-                        -->
-                        <excludes>
-                          <exclude>webapp</exclude>
-                        </excludes>
-                     </generator>
-                  </configuration>
                   <executions>
                      <execution>
                         <goals>

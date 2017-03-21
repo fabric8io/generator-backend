@@ -1,3 +1,6 @@
 kind: Template
 parameters:
 - name: FORGE_URL
+- name: CA_CERTIFICATE
+- name: CERTIFICATE
+- name: KEY

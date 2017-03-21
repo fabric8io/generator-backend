@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@Library('github.com/fabric8io/fabric8-pipeline-library@master')
+@Library('github.com/rawlingsj/fabric8-pipeline-library@master')
 def releaseVersion
 
 releaseNode{
@@ -34,7 +34,7 @@ releaseNode{
   }
 }
 
-deployOpenShiftNode(openshiftConfigSecretName: 'dsaas-preview-fabric8-forge-config'){
+deployOpenShiftNode(openshiftConfigSecretName: 'dsaas-preview-fabric8-forge-config', routeCertsSecretName: 'dsaas-preview-route-certs'){
   ws{
     stage "Deploying ${releaseVersion}"
     container(name: 'clients') {
@@ -44,10 +44,27 @@ deployOpenShiftNode(openshiftConfigSecretName: 'dsaas-preview-fabric8-forge-conf
       def forgeURL = 'forge.api.prod-preview.openshift.io'
       def yaml = "http://central.maven.org/maven2/io/fabric8/${name}/${releaseVersion}/${name}-${releaseVersion}-openshift.yml"
 
-      echo "now deploying to namespace ${prj}"
-      sh """
-        oc process -n ${prj} -f ${yaml} -v FORGE_URL=${forgeURL} | oc apply -n ${prj} -f -
-      """
+      def caCertificate = ''
+      def certificate = ''
+      def key = ''
+
+      if (fileExists('/root/home/.routeCerts/caCertificate')){
+        caCertificate = readFile '/root/home/.routeCerts/caCertificate'
+        certificate = readFile '/root/home/.routeCerts/certificate'
+        key = readFile '/root/home/.routeCerts/key'
+      }
+
+      wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: [
+          [password: caCertificate, var: 'ROUTE_CA_CERT'],
+          [password: certificate, var: 'ROUTE_CERT'],
+          [password: key, var: 'ROUTE_KEY']]]) {
+
+        echo "now deploying to namespace ${prj}"
+        sh """
+          oc process -n ${prj} -f ${yaml} -v FORGE_URL=${forgeURL} -v CERTIFICATE=${certificate} -v CA_CERTIFICATE=${caCertificate} -v KEY=${key} | oc apply -n ${prj} -f -
+        """
+      }
+
       sleep 10 // ok bad bad but there's a delay between DC's being applied and new pods being started.  lets find a better way to do this looking at the new DC perhaps?
 
       waitUntil{

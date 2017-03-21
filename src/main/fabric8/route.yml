@@ -6,5 +6,8 @@ spec:
     kind: Service
     name: "generator-backend"
   tls:
+    caCertificate: ${CA_CERTIFICATE}
+    certificate: ${CERTIFICATE}
     termination: edge
     insecureEdgeTerminationPolicy: Redirect
+    key: ${KEY}
