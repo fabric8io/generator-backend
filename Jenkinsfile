@@ -16,21 +16,40 @@
  */
 @Library('github.com/rawlingsj/fabric8-pipeline-library@master')
 def releaseVersion
+def newRelease
+def name = 'generator-backend'
 
-releaseNode{
-  ws{
-    checkout scm
-    readTrusted 'release.groovy'
-    sh "git remote set-url origin git@github.com:fabric8io/generator-backend.git"
+node{
+  properties([
+    parameters ([
+            choice(choices: 'new release\nredeploy latest', description: 'Optionally avoid a new release and redeploy the latest available version?', name: 'release')
+      ])
+  ])
+  newRelease = params.release == 'new release' ? true : false
+}
 
-    def pipeline = load 'release.groovy'
+if (newRelease){
+  releaseNode{
+    ws{
+      checkout scm
+      readTrusted 'release.groovy'
+      sh "git remote set-url origin git@github.com:fabric8io/generator-backend.git"
 
-    stage 'Stage'
-    def stagedProject = pipeline.stage()
-    releaseVersion = stagedProject[1]
+      def pipeline = load 'release.groovy'
 
-    stage 'Promote'
-    pipeline.release(stagedProject)
+      stage 'Stage'
+      def stagedProject = pipeline.stage()
+      releaseVersion = stagedProject[1]
+
+      stage 'Promote'
+      pipeline.release(stagedProject)
+    }
+  }
+} else {
+  node {
+    def cmd = "curl -L http://central.maven.org/maven2/io/fabric8/${name}/maven-metadata.xml | grep '<latest' | cut -f2 -d'>'|cut -f1 -d'<'"
+    releaseVersion = sh(script: cmd, returnStdout: true).toString().trim()
+    echo "Skipping release and redeploying ${releaseVersion}"
   }
 }
 
@@ -40,7 +59,6 @@ deployOpenShiftNode(openshiftConfigSecretName: 'dsaas-preview-fabric8-forge-conf
     container(name: 'clients') {
       
       def prj = 'dsaas-preview-fabric8-forge'
-      def name = 'generator-backend'
       def forgeURL = 'forge.api.prod-preview.openshift.io'
       def yaml = "http://central.maven.org/maven2/io/fabric8/${name}/${releaseVersion}/${name}-${releaseVersion}-openshift.yml"
 
