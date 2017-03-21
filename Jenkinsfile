@@ -72,7 +72,7 @@ deployOpenShiftNode(openshiftConfigSecretName: 'dsaas-preview-fabric8-forge-conf
       // wait until the pods are running
       waitUntil{
         try{
-          sh "oc get pod -l project=${name},provider=fabric8 -n ${prj} | grep Running"
+          sh "oc get pod -l project=${name},provider=fabric8 -n ${prj} | grep '1/1       Running'"
           echo "${name} pod Running for v ${releaseVersion}"
           return true
         } catch (err) {
