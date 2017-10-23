@@ -6,4 +6,6 @@ parameters:
   value: https://sso.prod-preview.openshift.io
 - name: WIT_URL
   value: https://api.prod-preview.openshift.io/
+- name: AUTH_URL
+  value: https://auth.prod-preview.openshift.io
 

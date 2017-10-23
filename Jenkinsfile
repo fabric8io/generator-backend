@@ -76,6 +76,7 @@ if (utils.isCI()){
   deployOpenShiftNode(openshiftConfigSecretName: 'dsaas-preview-config', label: "deploy_prodpreview_generator_backend_master_${env.BUILD_NUMBER}"){
     def namespace = 'dsaas-preview'
     def witApiURL = 'https://api.prod-preview.openshift.io/'
+    def authApiURL = 'https://auth.prod-preview.openshift.io'
     def openshiftURL = 'https://api.free-int.openshift.com'
     def keycloakURL = 'https://sso.prod-preview.openshift.io'
 
@@ -84,7 +85,7 @@ if (utils.isCI()){
         pipeline = load 'release.groovy'
     }
     
-    pipeline.deploy(name, namespace, releaseVersion, openshiftURL, keycloakURL, witApiURL)
+    pipeline.deploy(name, namespace, releaseVersion, openshiftURL, keycloakURL, witApiURL, authApiURL)
 
     pipeline.approve(releaseVersion, project)
     if (newRelease){
@@ -95,9 +96,10 @@ if (utils.isCI()){
   deployOpenShiftNode(openshiftConfigSecretName: 'dsaas-prod-config', label: "deploy_prod_generator_backend_master_${env.BUILD_NUMBER}"){
     def namespace = 'dsaas-production'
     def witApiURL = 'https://api.openshift.io/'
+    def authApiURL = 'https://auth.openshift.io'
     def openshiftURL = 'https://api.starter-us-east-2.openshift.com'
     def keycloakURL = 'https://sso.openshift.io'
-    pipeline.deploy(name, namespace, releaseVersion, openshiftURL, keycloakURL, witApiURL)
+    pipeline.deploy(name, namespace, releaseVersion, openshiftURL, keycloakURL, witApiURL, authApiURL)
 
   }
 }

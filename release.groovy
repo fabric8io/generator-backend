@@ -52,7 +52,7 @@ def updateDownstreamDependencies(stagedProject) {
 }
 
 
-def deploy(name, namespace, releaseVersion, openshiftURL, keycloakURL, witApiURL){
+def deploy(name, namespace, releaseVersion, openshiftURL, keycloakURL, witApiURL, authApiURL){
   ws{
     stage "Deploying ${releaseVersion}"
     container(name: 'clients') {
@@ -61,7 +61,7 @@ def deploy(name, namespace, releaseVersion, openshiftURL, keycloakURL, witApiURL
 
       echo "now deploying to namespace ${namespace}"
       sh """
-        oc process -v WIT_URL=${witApiURL} -v OPENSHIFT_API_URL=${openshiftURL} -v KEYCLOAK_SAAS_URL=${keycloakURL} -n ${namespace} -f ${yaml} | oc apply --force -n ${namespace} -f -
+        oc process -v WIT_URL=${witApiURL} -v AUTH_URL=${authApiURL} -v OPENSHIFT_API_URL=${openshiftURL} -v KEYCLOAK_SAAS_URL=${keycloakURL} -n ${namespace} -f ${yaml} | oc apply --force -n ${namespace} -f -
       """
 
       sleep 10 // ok bad bad but there's a delay between DC's being applied and new pods being started.  lets find a better way to do this looking at the new DC perhaps?

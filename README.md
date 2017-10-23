@@ -23,6 +23,7 @@ If you are [running fabric8 locally on MiniShift](https://github.com/fabric8io/f
 export OPENSHIFT_API_URL=https://`minishift ip`:8443
 export KEYCLOAK_SAAS_URL="http://`oc get route keycloak --template={{.spec.host}} -n fabric8`/"
 export WIT_URL="http://`oc get route wit --template={{.spec.host}} -n fabric8`/"
+export AUTH_URL="http://`oc get route auth --template={{.spec.host}} -n fabric8`/"
 ```
 
 
@@ -31,6 +32,7 @@ export WIT_URL="http://`oc get route wit --template={{.spec.host}} -n fabric8`/"
 export OPENSHIFT_API_URL=https://`minikube ip`:8443
 export KEYCLOAK_SAAS_URL="http://`kubectl get ingress -n fabric8 --template='{{ (index .spec.rules 0).host}}' f8tenant`/"
 export WIT_URL="http://`kubectl get ingress -n fabric8 --template='{{ (index .spec.rules 0).host}}' wit`/"
+export AUTH_URL="http://`kubectl get ingress -n fabric8 --template='{{ (index .spec.rules 0).host}}' auth`/"
 ```
 
 
