@@ -22,9 +22,9 @@
       <fabric8.generator.version>1.0.75</fabric8.generator.version>
       <maven.enforcer.plugin.version>1.4</maven.enforcer.plugin.version>
       <wildfly.swarm.version>2017.3.2</wildfly.swarm.version>
-      <forge.version>3.6.1.Final</forge.version>
-      <forge.service.version>1.0.0.CR3</forge.service.version>
-      <furnace.version>2.25.4.Final</furnace.version>
+      <forge.version>3.8.0.Final</forge.version>
+      <forge.service.version>1.0.2.Final</forge.service.version>
+      <furnace.version>2.27.0.Final</furnace.version>
       <!-- SCM properties -->
       <obs.scm.git.connection>scm:git:git://github.com/fabric8io/generator-backend.git</obs.scm.git.connection>
       <obs.scm.dev.connection>scm:git:git@github.com:fabric8io/generator-backend.git</obs.scm.dev.connection>
@@ -284,6 +284,12 @@
          <groupId>org.jboss.forge</groupId>
          <artifactId>forge-service-core</artifactId>
       </dependency>
+     <dependency>
+       <groupId>org.jboss.forge.furnace</groupId>
+       <artifactId>furnace</artifactId>
+       <version>${furnace.version}</version>
+     </dependency>
+
      <dependency>
        <groupId>io.fabric8.forge</groupId>
        <artifactId>fabric8-generator</artifactId>

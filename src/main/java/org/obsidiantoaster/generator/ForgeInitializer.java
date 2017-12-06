@@ -31,6 +31,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
+import org.jboss.forge.addon.projects.Projects;
 import org.jboss.forge.furnace.repositories.AddonRepositoryMode;
 import org.jboss.forge.service.producer.FurnaceProducer;
 import org.obsidiantoaster.generator.event.FurnaceStartup;
@@ -58,6 +59,8 @@ public class ForgeInitializer implements ServletContextListener
       {
          // Skip unnecessary build status checks in Forge
          System.setProperty("PROJECT_BUILDSTATUS_SKIP", "true");
+         // Disable project caches and file monitoring
+         Projects.disableCache();
          // Create a temp file to store the configuration properties
          File tmpFile = File.createTempFile("config", ".properties");
          tmpFile.deleteOnExit();
