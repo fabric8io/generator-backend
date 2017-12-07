@@ -86,7 +86,9 @@ if (utils.isCI()){
     }
     
     pipeline.deploy(name, namespace, releaseVersion, openshiftURL, keycloakURL, witApiURL, authApiURL)
+  }
 
+/*
     pipeline.approve(releaseVersion, project)
     if (newRelease){
       pipeline.updateGeneratorTemplate(name, releaseVersion)
@@ -102,4 +104,5 @@ if (utils.isCI()){
     pipeline.deploy(name, namespace, releaseVersion, openshiftURL, keycloakURL, witApiURL, authApiURL)
 
   }
+*/
 }
